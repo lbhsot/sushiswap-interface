@@ -4,20 +4,15 @@ import {
   BENTOBOX_ADDRESS,
   BORING_HELPER_ADDRESS,
   CHAIN_KEY,
-  ChainId,
   CHAINLINK_ORACLE_ADDRESS,
   ENS_REGISTRAR_ADDRESS,
-  FACTORY_ADDRESS,
   MAKER_ADDRESS,
   MASTERCHEF_ADDRESS,
   MASTERCHEF_V2_ADDRESS,
   MERKLE_DISTRIBUTOR_ADDRESS,
   MINICHEF_ADDRESS,
-  MULTICALL2_ADDRESS,
-  ROUTER_ADDRESS,
   SUSHI_ADDRESS,
   TIMELOCK_ADDRESS,
-  WNATIVE_ADDRESS,
 } from '@sushiswap/core-sdk'
 import { LIMIT_ORDER_HELPER_ADDRESS, STOP_LIMIT_ORDER_ADDRESS } from '@sushiswap/limit-order-sdk'
 import MISO from '@sushiswap/miso/exports/all.json'
@@ -62,13 +57,19 @@ import UNI_FACTORY_ABI from 'app/constants/abis/uniswap-v2-factory.json'
 import IUniswapV2PairABI from 'app/constants/abis/uniswap-v2-pair.json'
 import WETH9_ABI from 'app/constants/abis/weth.json'
 import ZENKO_ABI from 'app/constants/abis/zenko.json'
+import {
+  ChainId,
+  FACTORY_ADDRESS,
+  MULTICALL_ADDRESS,
+  MULTICALL2_ADDRESS,
+  ROUTER_ADDRESS,
+  WNATIVE_ADDRESS,
+} from 'app/constants/extension'
 import LPToken from 'app/features/migration/LPToken'
 import { poolEntityMapper } from 'app/features/trident/poolEntityMapper'
 import { getContract } from 'app/functions'
 import { useActiveWeb3React } from 'app/services/web3'
 import { useMemo } from 'react'
-
-const UNI_FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
 
 export function useEIP2612Contract(tokenAddress?: string): Contract | null {
   return useContract(tokenAddress, EIP_2612_ABI, false)
@@ -166,35 +167,6 @@ export function useMulticall2Contract() {
   return useContract(chainId ? MULTICALL2_ADDRESS[chainId] : undefined, MULTICALL2_ABI, false)
 }
 
-const MULTICALL_ADDRESS = {
-  [ChainId.ETHEREUM]: '0x1F98415757620B543A52E61c46B32eB19261F984',
-  [ChainId.ROPSTEN]: '0x1F98415757620B543A52E61c46B32eB19261F984',
-  [ChainId.RINKEBY]: '0x1F98415757620B543A52E61c46B32eB19261F984',
-  [ChainId.GÖRLI]: '0x1F98415757620B543A52E61c46B32eB19261F984',
-  [ChainId.KOVAN]: '0x1F98415757620B543A52E61c46B32eB19261F984',
-  [ChainId.MATIC]: '0x1F98415757620B543A52E61c46B32eB19261F984',
-  [ChainId.MATIC_TESTNET]: '0xdDCbf776dF3dE60163066A5ddDF2277cB445E0F3',
-  [ChainId.OPTIMISM]: '0x1F98415757620B543A52E61c46B32eB19261F984',
-  [ChainId.ARBITRUM]: '0xadF885960B47eA2CD9B55E6DAc6B42b7Cb2806dB',
-  [ChainId.MOONBEAM]: '0x34c471ddceb20018bbb73f6d13709936fc870acc',
-  [ChainId.AVALANCHE]: '0x8C0F842791F03C095b6c633759224FcC9ACe68ea',
-  [ChainId.BSC]: '0x47A307e3167820daf22a377D777371753758f59c',
-  [ChainId.FANTOM]: '0xB1395e098c0a847CC719Bcf1Fc8114421a9F8232',
-  [ChainId.CELO]: '0x3d0B3b816DC1e0825808F27510eF7Aa5E3136D75',
-  [ChainId.HARMONY]: '0xaAB49386BFcB605F853763Ea382B91C9c83b9Ac5',
-  [ChainId.MOONRIVER]: '0x8C8BF5Dea280A1eC68219D66E8A21E60585830F5',
-  [ChainId.XDAI]: '0x2B75358D07417D4e895c952Ca84A44E63AEBE3Dd',
-  [ChainId.TELOS]: '0x64e1E895866B3126f8f2E2912B475FDB35b2F315',
-  [ChainId.FUSE]: '0x393B6DC9B00E18314888678721eC0e923FC5f49D',
-  [ChainId.OKEX]: '0x8C8BF5Dea280A1eC68219D66E8A21E60585830F5',
-  [ChainId.HECO]: '0x64e1E895866B3126f8f2E2912B475FDB35b2F315',
-  [ChainId.PALM]: '0x4d4A0D45a98AE8EC25b359D93A088A87BC9eF70b',
-  [ChainId.KAVA]: '0x67dA5f2FfaDDfF067AB9d5F025F8810634d84287',
-  [ChainId.METIS]: '0x67dA5f2FfaDDfF067AB9d5F025F8810634d84287',
-  [ChainId.ARBITRUM_NOVA]: '0x0769fd68dFb93167989C6f7254cd0D766Fb2841F',
-  [ChainId.BOBA_AVAX]: '0x67dA5f2FfaDDfF067AB9d5F025F8810634d84287',
-}
-
 export function useInterfaceMulticall(): Contract | null | undefined {
   return useContract(MULTICALL_ADDRESS, MULTICALL_ABI, false)
 }
@@ -255,7 +227,8 @@ export function useChainlinkOracle(): Contract | null {
 }
 
 export function useUniV2FactoryContract(): Contract | null {
-  return useContract(UNI_FACTORY_ADDRESS, UNI_FACTORY_ABI, false)
+  const { chainId } = useActiveWeb3React()
+  return useContract(chainId ? FACTORY_ADDRESS[chainId] : undefined, UNI_FACTORY_ABI, false)
 }
 
 // @ts-ignore TYPE NEEDS FIXING

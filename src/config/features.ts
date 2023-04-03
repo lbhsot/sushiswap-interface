@@ -1,24 +1,11 @@
-import { ChainId } from '@sushiswap/core-sdk'
+import { ChainId } from 'app/constants/extension'
 import { Feature } from 'app/enums'
 
 type FeatureMap = { readonly [chainId in ChainId]?: Feature[] }
 
 const features: FeatureMap = {
-  [ChainId.ETHEREUM]: [
-    Feature.AMM,
-    Feature.LIQUIDITY_MINING,
-    Feature.BENTOBOX,
-    Feature.KASHI,
-    Feature.ANALYTICS,
-    Feature.STAKING,
-    Feature.MISO,
-    Feature.MEOWSHI,
-    Feature.INARI,
-    Feature.VESTING,
-    Feature.LIMIT_ORDERS,
-    Feature.SUSHIGUARD,
-    Feature.SUBGRAPH,
-  ],
+  [ChainId.ZKSYNC_TESTNET]: [Feature.AMM, Feature.LIQUIDITY_MINING],
+  [ChainId.ETHEREUM]: [Feature.AMM, Feature.LIQUIDITY_MINING],
   [ChainId.ROPSTEN]: [Feature.AMM, Feature.LIQUIDITY_MINING, Feature.BENTOBOX, Feature.KASHI, Feature.MISO],
   [ChainId.RINKEBY]: [Feature.AMM, Feature.LIQUIDITY_MINING, Feature.BENTOBOX, Feature.KASHI, Feature.MISO],
   [ChainId.GÖRLI]: [Feature.AMM, Feature.LIQUIDITY_MINING, Feature.BENTOBOX, Feature.KASHI, Feature.MISO],

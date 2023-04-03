@@ -1,4 +1,5 @@
-import { ChainId, Currency, WNATIVE } from '@sushiswap/core-sdk'
+import { Currency } from '@sushiswap/core-sdk'
+import { ChainId, WNATIVE } from 'app/constants/extension'
 import useHttpLocations from 'app/hooks/useHttpLocations'
 import { WrappedTokenInfo } from 'app/state/lists/wrappedTokenInfo'
 import React, { FunctionComponent, useMemo } from 'react'
@@ -27,6 +28,7 @@ const BLOCKCHAIN = {
   [ChainId.METIS]: 'metis',
   [ChainId.ARBITRUM_NOVA]: 'arbitrum-nova',
   [ChainId.HARDHAT]: 'hardhat',
+  [ChainId.ZKSYNC_TESTNET]: 'zksync-testnet',
 }
 
 // @ts-ignore TYPE NEEDS FIXING
@@ -111,6 +113,7 @@ const LOGO: Record<number, string> = {
   [ChainId.ARBITRUM_NOVA]: EthereumLogo,
   [ChainId.METIS]: MetisLogo,
   [ChainId.BOBA_AVAX]: BobaLogo,
+  [ChainId.ZKSYNC_TESTNET]: BobaLogo,
 }
 
 export interface CurrencyLogoProps {

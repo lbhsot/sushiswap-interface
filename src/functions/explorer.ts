@@ -1,4 +1,4 @@
-import { ChainId } from '@sushiswap/core-sdk'
+import { ChainId } from 'app/constants/extension'
 
 const explorers = {
   etherscan: (link: string, data: string, type: 'transaction' | 'token' | 'address' | 'block') => {
@@ -224,6 +224,14 @@ const chains: ChainObject = {
   [ChainId.BOBA_AVAX]: {
     link: 'https://blockexplorer.avax.boba.network',
     builder: explorers.blockscout,
+  },
+  [ChainId.ZKSYNC_TESTNET]: {
+    link: 'https://goerli.explorer.zksync.io',
+    builder: explorers.etherscan,
+  },
+  [ChainId.ZKSYNC_MAINNET]: {
+    link: 'https://explorer.zksync.io',
+    builder: explorers.etherscan,
   },
 }
 

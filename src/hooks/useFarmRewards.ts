@@ -1,6 +1,8 @@
 import { getAddress } from '@ethersproject/address'
-import { ChainId, Currency, NATIVE, SUSHI, Token } from '@sushiswap/core-sdk'
+import { Currency, SUSHI, Token } from '@sushiswap/core-sdk'
 import * as XDAI_TOKENS from 'app/config/tokens/xdai'
+import { ChainId } from 'app/constants/extension'
+import { NATIVE } from 'app/constants/extension/native'
 import { Feature } from 'app/enums'
 import { Chef, PairType } from 'app/features/onsen/enum'
 import { usePositions } from 'app/features/onsen/hooks'
@@ -32,7 +34,7 @@ import { useCallback, useMemo } from 'react'
 
 import { useAllTokens } from './Tokens'
 
-export default function useFarmRewards({ chainId = ChainId.ETHEREUM }) {
+export default function useFarmRewards({ chainId = ChainId.ZKSYNC_TESTNET }) {
   const positions = usePositions(chainId)
   const { data: block1d } = useOneDayBlock({ chainId, shouldFetch: !!chainId })
   const farms = useFarms({ chainId })

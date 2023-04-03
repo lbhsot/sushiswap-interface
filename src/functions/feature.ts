@@ -1,5 +1,5 @@
-import { ChainId } from '@sushiswap/core-sdk'
 import features from 'app/config/features'
+import { ChainId } from 'app/constants/extension'
 import { Feature } from 'app/enums'
 
 export function featureEnabled(feature: Feature, chainId: ChainId = ChainId.ETHEREUM): boolean {

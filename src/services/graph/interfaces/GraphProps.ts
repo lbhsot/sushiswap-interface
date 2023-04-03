@@ -1,4 +1,4 @@
-import { ChainId } from '@sushiswap/core-sdk'
+import { ChainId } from 'app/constants/extension'
 import { SWRConfiguration } from 'swr'
 
 export interface GraphProps {

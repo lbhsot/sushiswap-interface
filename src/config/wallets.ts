@@ -1,6 +1,6 @@
 // import { SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react'
-import { ChainId } from '@sushiswap/core-sdk'
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import { ChainId } from 'app/constants/extension'
 // import { PortisConnector } from 'web3-react-portis-connector'
 // import { WalletConnectConnector } from 'web3-react-walletconnect-connector'
 // import { WalletLinkConnector } from 'web3-react-walletlink-connector'
@@ -10,7 +10,12 @@ import { InjectedConnector } from 'web3-react-injected-connector'
 
 import RPC from './rpc'
 
-const supportedChainIds = Object.values(ChainId) as number[]
+const supportedChainIds = [
+  ChainId.ETHEREUM,
+  ChainId.ARBITRUM,
+  ChainId.ZKSYNC_TESTNET,
+  ChainId.ZKSYNC_MAINNET,
+] as number[]
 
 // export const network = new NetworkConnector({
 //   defaultChainId: 1,
@@ -24,10 +29,10 @@ export const getNetworkConnector = (): NetworkConnector => {
     return network
   }
 
-  const defaultChainId = Cookies.get('chain-id')
+  const defaultChainId = Cookies.get('chain-id') || '280'
 
   return (network = new NetworkConnector({
-    defaultChainId: defaultChainId ? Number(defaultChainId) : 1,
+    defaultChainId: Number(defaultChainId),
     urls: RPC,
   }))
 }
@@ -77,23 +82,23 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     mobile: true,
     mobileOnly: true,
   },
-  WALLET_CONNECT: {
-    connector: async () => {
-      const WalletConnectConnector = (await import('web3-react-walletconnect-connector')).WalletConnectConnector
-      return new WalletConnectConnector({
-        rpc: RPC,
-        bridge: 'https://bridge.walletconnect.org',
-        qrcode: true,
-        supportedChainIds,
-      })
-    },
-    name: 'WalletConnect',
-    iconName: 'wallet-connect.svg',
-    description: 'Connect to Trust Wallet, Rainbow Wallet and more...',
-    href: null,
-    color: '#4196FC',
-    mobile: true,
-  },
+  // WALLET_CONNECT: {
+  //   connector: async () => {
+  //     const WalletConnectConnector = (await import('web3-react-walletconnect-connector')).WalletConnectConnector
+  //     return new WalletConnectConnector({
+  //       rpc: RPC,
+  //       bridge: 'https://bridge.walletconnect.org',
+  //       qrcode: true,
+  //       supportedChainIds,
+  //     })
+  //   },
+  //   name: 'WalletConnect',
+  //   iconName: 'wallet-connect.svg',
+  //   description: 'Connect to Trust Wallet, Rainbow Wallet and more...',
+  //   href: null,
+  //   color: '#4196FC',
+  //   mobile: true,
+  // },
   // KEYSTONE: {
   //   connector: async () => {
   //     const KeystoneConnector = (await import('@keystonehq/keystone-connector')).KeystoneConnector
@@ -125,61 +130,61 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
   //   color: '#40a9ff',
   //   mobile: true,
   // },
-  WALLET_LINK: {
-    connector: async () => {
-      const WalletLinkConnector = (await import('web3-react-walletlink-connector')).WalletLinkConnector
-      return new WalletLinkConnector({
-        url: RPC[ChainId.ETHEREUM],
-        appName: 'SushiSwap',
-        appLogoUrl: 'https://raw.githubusercontent.com/sushiswap/art/master/sushi/logo-256x256.png',
-        darkMode: true,
-      })
-    },
-    name: 'Coinbase Wallet',
-    iconName: 'coinbase.svg',
-    description: 'Use Coinbase Wallet app on mobile device',
-    href: null,
-    color: '#315CF5',
-  },
-  COINBASE_LINK: {
-    name: 'Open in Coinbase Wallet',
-    iconName: 'coinbase.svg',
-    description: 'Open in Coinbase Wallet app.',
-    href: 'https://go.cb-w.com',
-    color: '#315CF5',
-    mobile: true,
-    mobileOnly: true,
-  },
-  FORTMATIC: {
-    connector: async () => {
-      const FortmaticConnector = (await import('web3-react-fortmatic-connector')).FortmaticConnector
-      return new FortmaticConnector({
-        apiKey: process.env.NEXT_PUBLIC_FORTMATIC_API_KEY ?? '',
-        chainId: 1,
-      })
-    },
-    name: 'Fortmatic',
-    iconName: 'fortmatic.png',
-    description: 'Login using Fortmatic hosted wallet',
-    href: null,
-    color: '#6748FF',
-    mobile: true,
-  },
-  Portis: {
-    connector: async () => {
-      const PortisConnector = (await import('web3-react-portis-connector')).PortisConnector
-      return new PortisConnector({
-        dAppId: process.env.NEXT_PUBLIC_PORTIS_ID ?? '',
-        networks: [1],
-      })
-    },
-    name: 'Portis',
-    iconName: 'portis.png',
-    description: 'Login using Portis hosted wallet',
-    href: null,
-    color: '#4A6C9B',
-    mobile: true,
-  },
+  // WALLET_LINK: {
+  //   connector: async () => {
+  //     const WalletLinkConnector = (await import('web3-react-walletlink-connector')).WalletLinkConnector
+  //     return new WalletLinkConnector({
+  //       url: RPC[ChainId.ETHEREUM],
+  //       appName: 'SushiSwap',
+  //       appLogoUrl: 'https://raw.githubusercontent.com/sushiswap/art/master/sushi/logo-256x256.png',
+  //       darkMode: true,
+  //     })
+  //   },
+  //   name: 'Coinbase Wallet',
+  //   iconName: 'coinbase.svg',
+  //   description: 'Use Coinbase Wallet app on mobile device',
+  //   href: null,
+  //   color: '#315CF5',
+  // },
+  // COINBASE_LINK: {
+  //   name: 'Open in Coinbase Wallet',
+  //   iconName: 'coinbase.svg',
+  //   description: 'Open in Coinbase Wallet app.',
+  //   href: 'https://go.cb-w.com',
+  //   color: '#315CF5',
+  //   mobile: true,
+  //   mobileOnly: true,
+  // },
+  // FORTMATIC: {
+  //   connector: async () => {
+  //     const FortmaticConnector = (await import('web3-react-fortmatic-connector')).FortmaticConnector
+  //     return new FortmaticConnector({
+  //       apiKey: process.env.NEXT_PUBLIC_FORTMATIC_API_KEY ?? '',
+  //       chainId: 1,
+  //     })
+  //   },
+  //   name: 'Fortmatic',
+  //   iconName: 'fortmatic.png',
+  //   description: 'Login using Fortmatic hosted wallet',
+  //   href: null,
+  //   color: '#6748FF',
+  //   mobile: true,
+  // },
+  // Portis: {
+  //   connector: async () => {
+  //     const PortisConnector = (await import('web3-react-portis-connector')).PortisConnector
+  //     return new PortisConnector({
+  //       dAppId: process.env.NEXT_PUBLIC_PORTIS_ID ?? '',
+  //       networks: [1],
+  //     })
+  //   },
+  //   name: 'Portis',
+  //   iconName: 'portis.png',
+  //   description: 'Login using Portis hosted wallet',
+  //   href: null,
+  //   color: '#4A6C9B',
+  //   mobile: true,
+  // },
   // Torus: {
   //   connector: async () => {
   //     const TorusConnector = (await import('web3-react/torus-connector')).TorusConnector
@@ -208,25 +213,25 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     color: '#F0B90B',
     mobile: true,
   },
-  Clover: {
-    connector: async () => {
-      const CloverConnector = (await import('@clover-network/clover-connector')).CloverConnector
-      return new CloverConnector({
-        supportedChainIds: [1],
-      })
-    },
-    name: 'Clover',
-    iconName: 'clover.svg',
-    description: 'Login using Clover hosted wallet',
-    href: null,
-    color: '#269964',
-  },
-  Gamestop: {
-    connector: gamestopConnector,
-    name: 'GameStop',
-    iconName: 'gamestop.png',
-    description: 'Login using GameStop extension wallet',
-    href: null,
-    color: '#269964',
-  },
+  // Clover: {
+  //   connector: async () => {
+  //     const CloverConnector = (await import('@clover-network/clover-connector')).CloverConnector
+  //     return new CloverConnector({
+  //       supportedChainIds: [1],
+  //     })
+  //   },
+  //   name: 'Clover',
+  //   iconName: 'clover.svg',
+  //   description: 'Login using Clover hosted wallet',
+  //   href: null,
+  //   color: '#269964',
+  // },
+  // Gamestop: {
+  //   connector: gamestopConnector,
+  //   name: 'GameStop',
+  //   iconName: 'gamestop.png',
+  //   description: 'Login using GameStop extension wallet',
+  //   href: null,
+  //   color: '#269964',
+  // },
 }

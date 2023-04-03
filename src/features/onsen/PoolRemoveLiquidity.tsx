@@ -161,6 +161,7 @@ const PoolWithdraw = ({ currencyA, currencyB, header }) => {
           account,
           deadline.toHexString(),
         ]
+        console.log('123', currencyBIsETH, args)
       }
       // removeLiquidity
       else {

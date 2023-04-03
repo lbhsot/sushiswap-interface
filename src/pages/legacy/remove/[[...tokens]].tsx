@@ -4,7 +4,7 @@ import { TransactionResponse } from '@ethersproject/providers'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import { t } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
-import { ChainId, NATIVE, Percent, WNATIVE, WNATIVE_ADDRESS } from '@sushiswap/core-sdk'
+import { Percent, Token } from '@sushiswap/core-sdk'
 import Button from 'app/components/Button'
 import { CurrencyLogo } from 'app/components/CurrencyLogo'
 import Input from 'app/components/Input'
@@ -12,6 +12,8 @@ import ListPanel from 'app/components/ListPanel'
 import SettingsTab from 'app/components/Settings'
 import Typography from 'app/components/Typography'
 import Web3Connect from 'app/components/Web3Connect'
+import { ChainId, WNATIVE, WNATIVE_ADDRESS } from 'app/constants/extension'
+import { NATIVE } from 'app/constants/extension/native'
 import { classNames, unwrappedCurrencyAmount } from 'app/functions'
 import { calculateGasMargin, calculateSlippageAmount } from 'app/functions/trade'
 import { useCurrency } from 'app/hooks/Tokens'
@@ -19,13 +21,14 @@ import { ApprovalState, useApproveCallback } from 'app/hooks/useApproveCallback'
 import { usePairContract, useRouterContract } from 'app/hooks/useContract'
 import useDebouncedChangeHandler from 'app/hooks/useDebouncedChangeHandler'
 import { useV2LiquidityTokenPermit } from 'app/hooks/useERC20Permit'
+import usePairMap from 'app/hooks/usePairMap'
 import useTransactionDeadline from 'app/hooks/useTransactionDeadline'
 import { SwapLayout, SwapLayoutCard } from 'app/layouts/SwapLayout'
 import TransactionConfirmationModal, { ConfirmationModalContent } from 'app/modals/TransactionConfirmationModal'
 import { useActiveWeb3React } from 'app/services/web3'
 import { USER_REJECTED_TX } from 'app/services/web3/WalletError'
 import { Field } from 'app/state/burn/actions'
-import { useBurnActionHandlers, useDerivedBurnInfo } from 'app/state/burn/hooks'
+import { useBurnActionHandlers, useDerivedBurnInfoWithPairMap } from 'app/state/burn/hooks'
 import { useAppSelector } from 'app/state/hooks'
 import { selectSlippageWithDefault } from 'app/state/slippage/slippageSlice'
 import { useTransactionAdder } from 'app/state/transactions/hooks'
@@ -45,8 +48,23 @@ export default function Remove() {
   const { account, chainId, library } = useActiveWeb3React()
   const [tokenA, tokenB] = useMemo(() => [currencyA?.wrapped, currencyB?.wrapped], [currencyA, currencyB])
 
+  const currencyTokenA = currencyA
+    ? new Token(currencyA.chainId, currencyA.wrapped.address, currencyA.decimals, currencyA.symbol, currencyA.name)
+    : undefined
+  const currencyTokenB = currencyB
+    ? new Token(currencyB.chainId, currencyB.wrapped.address, currencyB.decimals, currencyB.symbol, currencyB.name)
+    : undefined
+  const tokenList: [Token, Token][] = []
+  if (currencyTokenA && currencyTokenB) {
+    tokenList.push([currencyTokenA, currencyTokenB])
+  }
+  const { pairMap } = usePairMap(tokenList, library)
   // burn state
-  const { pair, parsedAmounts, error } = useDerivedBurnInfo(currencyA ?? undefined, currencyB ?? undefined)
+  const { pair, parsedAmounts, error } = useDerivedBurnInfoWithPairMap(
+    currencyA ?? undefined,
+    currencyB ?? undefined,
+    pairMap
+  )
   const { onUserInput: _onUserInput } = useBurnActionHandlers()
   const isValid = !error
 
@@ -127,6 +145,7 @@ export default function Remove() {
 
     let methodNames: string[], args: Array<string | string[] | number | boolean>
     // we have approval, use normal remove liquidity
+    console.log('approval', approval)
     if (approval === ApprovalState.APPROVED) {
       // removeLiquidityETH
       if (oneCurrencyIsETH) {
@@ -139,6 +158,7 @@ export default function Remove() {
           account,
           deadline.toHexString(),
         ]
+        console.log(currencyBIsETH, args)
       }
       // removeLiquidity
       else {
@@ -171,6 +191,11 @@ export default function Remove() {
           signatureData.r,
           signatureData.s,
         ]
+        console.log(
+          'removeLiquidityETHWithPermit, removeLiquidityETHWithPermitSupportingFeeOnTransferTokens',
+          currencyBIsETH,
+          args
+        )
       }
       // removeLiquidityETHWithPermit
       else {

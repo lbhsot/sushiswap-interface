@@ -1,4 +1,4 @@
-import { ChainId } from '@sushiswap/core-sdk'
+import { ChainId } from 'app/constants/extension'
 
 const Arbitrum = 'https://raw.githubusercontent.com/sushiswap/icons/master/network/arbitrum.jpg'
 const Avalanche = 'https://raw.githubusercontent.com/sushiswap/icons/master/network/avalanche.jpg'
@@ -62,6 +62,7 @@ export const NETWORK_ICON: Record<number, string> = {
   [ChainId.METIS]: Metis,
   [ChainId.ARBITRUM_NOVA]: ArbitrumNova,
   [ChainId.BOBA_AVAX]: BobaAvax,
+  [ChainId.ZKSYNC_TESTNET]: OKEx,
 }
 
 export const NETWORK_LABEL: Record<number, string> = {
@@ -99,4 +100,5 @@ export const NETWORK_LABEL: Record<number, string> = {
   [ChainId.METIS]: 'Metis',
   [ChainId.ARBITRUM_NOVA]: 'Arbitrum Nova',
   [ChainId.BOBA_AVAX]: 'Boba Avax',
+  [ChainId.ZKSYNC_TESTNET]: 'ZkSync Testnet',
 }

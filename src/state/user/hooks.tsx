@@ -1,20 +1,15 @@
 import { defaultAbiCoder } from '@ethersproject/abi'
 import { getCreate2Address } from '@ethersproject/address'
 import { AddressZero } from '@ethersproject/constants'
+import { Web3Provider } from '@ethersproject/providers'
 import { keccak256 } from '@ethersproject/solidity'
-import {
-  BENTOBOX_ADDRESS,
-  CHAINLINK_ORACLE_ADDRESS,
-  computePairAddress,
-  Currency,
-  FACTORY_ADDRESS,
-  KASHI_ADDRESS,
-  Pair,
-  Token,
-} from '@sushiswap/core-sdk'
+import { BENTOBOX_ADDRESS, CHAINLINK_ORACLE_ADDRESS, Currency, KASHI_ADDRESS, Pair, Token } from '@sushiswap/core-sdk'
 import { CHAINLINK_PRICE_FEED_MAP } from 'app/config/oracles/chainlink'
 import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from 'app/config/routing'
-import { e10 } from 'app/functions'
+import FACTORY_ABI from 'app/constants/abis/factory.json'
+import { FACTORY_ADDRESS } from 'app/constants/extension'
+import { computePairAddress } from 'app/constants/extension/functions/computePairAddress'
+import { e10, getContract } from 'app/functions'
 import { useAllTokens } from 'app/hooks/Tokens'
 import { useActiveWeb3React } from 'app/services/web3'
 import { AppState } from 'app/state'
@@ -180,6 +175,17 @@ export function toV2LiquidityToken([tokenA, tokenB]: [Token, Token]): Token {
     'UNI-V2',
     'Uniswap V2'
   )
+}
+
+export async function getPairToken([tokenA, tokenB]: [Token, Token], library: Web3Provider): Promise<Token> {
+  if (tokenA.chainId !== tokenB.chainId) throw new Error('Not matching chain IDs')
+  if (tokenA.equals(tokenB)) throw new Error('Tokens cannot be equal')
+  if (!FACTORY_ADDRESS[tokenA.chainId]) throw new Error('No V2 factory address on this chain')
+
+  const factoryContract = getContract(FACTORY_ADDRESS[tokenA.chainId], FACTORY_ABI, library)
+  let pair = AddressZero
+  pair = await factoryContract?.getPair(tokenA.address, tokenB.address)
+  return new Token(tokenA.chainId, pair, 18, 'UNI-V2', 'Uniswap V2')
 }
 
 const computeOracleData = (collateral: Currency, asset: Currency) => {

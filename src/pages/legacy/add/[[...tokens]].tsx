@@ -15,7 +15,7 @@ import LiquidityPrice from 'app/features/legacy/liquidity/LiquidityPrice'
 import UnsupportedCurrencyFooter from 'app/features/legacy/swap/UnsupportedCurrencyFooter'
 import SwapAssetPanel from 'app/features/trident/swap/SwapAssetPanel'
 import { currencyId } from 'app/functions/currency'
-import { calculateGasMargin, calculateSlippageAmount } from 'app/functions/trade'
+import { calculateSlippageAmount } from 'app/functions/trade'
 import { useCurrency } from 'app/hooks/Tokens'
 import { ApprovalState, useApproveCallback } from 'app/hooks/useApproveCallback'
 import { useRouterContract } from 'app/hooks/useContract'
@@ -25,7 +25,6 @@ import { PairState } from 'app/hooks/useV2Pairs'
 import { SwapLayout, SwapLayoutCard } from 'app/layouts/SwapLayout'
 import TransactionConfirmationModal, { ConfirmationModalContent } from 'app/modals/TransactionConfirmationModal'
 import { useActiveWeb3React } from 'app/services/web3'
-import { USER_REJECTED_TX } from 'app/services/web3/WalletError'
 import { useAppSelector } from 'app/state/hooks'
 import { Field } from 'app/state/mint/actions'
 import { useDerivedMintInfo, useMintActionHandlers, useMintState } from 'app/state/mint/hooks'
@@ -148,37 +147,58 @@ export default function Add() {
     }
 
     setAttemptingTxn(true)
-    await estimate(...args, value ? { value } : {})
-      .then((estimatedGasLimit) =>
-        method(...args, {
-          ...(value ? { value } : {}),
-          gasLimit: calculateGasMargin(estimatedGasLimit),
-        }).then((response) => {
-          setAttemptingTxn(false)
+    console.log(args, value)
+    const response = await method(...args, {
+      ...(value ? { value } : {}),
+    })
+    console.log(response)
+    setAttemptingTxn(false)
 
-          addTransaction(response, {
-            summary: i18n._(
-              t`Add ${parsedAmounts[Field.CURRENCY_A]?.toSignificant(3)} ${
-                currencies[Field.CURRENCY_A]?.symbol
-              } and ${parsedAmounts[Field.CURRENCY_B]?.toSignificant(3)} ${currencies[Field.CURRENCY_B]?.symbol}`
-            ),
-          })
+    addTransaction(response, {
+      summary: i18n._(
+        t`Add ${parsedAmounts[Field.CURRENCY_A]?.toSignificant(3)} ${
+          currencies[Field.CURRENCY_A]?.symbol
+        } and ${parsedAmounts[Field.CURRENCY_B]?.toSignificant(3)} ${currencies[Field.CURRENCY_B]?.symbol}`
+      ),
+    })
 
-          setTxHash(response.hash)
+    setTxHash(response.hash)
 
-          gtag('event', 'Add', {
-            event_category: 'Liquidity',
-            event_label: [currencies[Field.CURRENCY_A]?.symbol, currencies[Field.CURRENCY_B]?.symbol].join('/'),
-          })
-        })
-      )
-      .catch((error) => {
-        setAttemptingTxn(false)
-        // we only care if the error is something _other_ than the user rejected the tx
-        if (error?.code !== USER_REJECTED_TX) {
-          console.error(error)
-        }
-      })
+    gtag('event', 'Add', {
+      event_category: 'Liquidity',
+      event_label: [currencies[Field.CURRENCY_A]?.symbol, currencies[Field.CURRENCY_B]?.symbol].join('/'),
+    })
+    // await estimate(...args, value ? { value } : {})
+    //   .then((estimatedGasLimit) =>
+    //     method(...args, {
+    //       ...(value ? { value } : {}),
+    //       gasLimit: calculateGasMargin(estimatedGasLimit),
+    //     }).then((response) => {
+    //       setAttemptingTxn(false)
+    //
+    //       addTransaction(response, {
+    //         summary: i18n._(
+    //           t`Add ${parsedAmounts[Field.CURRENCY_A]?.toSignificant(3)} ${
+    //             currencies[Field.CURRENCY_A]?.symbol
+    //           } and ${parsedAmounts[Field.CURRENCY_B]?.toSignificant(3)} ${currencies[Field.CURRENCY_B]?.symbol}`
+    //         ),
+    //       })
+    //
+    //       setTxHash(response.hash)
+    //
+    //       gtag('event', 'Add', {
+    //         event_category: 'Liquidity',
+    //         event_label: [currencies[Field.CURRENCY_A]?.symbol, currencies[Field.CURRENCY_B]?.symbol].join('/'),
+    //       })
+    //     })
+    //   )
+    //   .catch((error) => {
+    //     setAttemptingTxn(false)
+    //     // we only care if the error is something _other_ than the user rejected the tx
+    //     if (error?.code !== USER_REJECTED_TX) {
+    //       console.error(error)
+    //     }
+    //   })
   }
 
   const ModalHeader = noLiquidity ? (
